@@ -1,0 +1,911 @@
+---
+layout: post
+title:  "XSS Test Cases"
+date:   2024-07-02 13:07:12 +0300
+categories: jekyll update
+---
+Hi, this is my first blog and first post.
+This post about xss test cases assignment given by Gallipoli.
+Gallipoli is newly formed group, the goal is to help people get started in Bug Bounty.
+There are a many experienced people in web security and many beginners too.
+I was interested in bbh, so I wanted to give it a shot, learn new things etc.
+The goal of this assignment is creating 3 test cases for each category: reflected xss, stored xss and dom xss.
+(e.g., post based reflected xss, get based reflected xss, header based reflected xss.)
+
+Let's get started!
+
+## Getting a VPS!
+
+First step is getting a vps, so we can test everything live.
+I choose amazon aws ec2 free tier, because it is **free** for 12 months.
+[Here](https://aws.amazon.com/ec2/?did=ft_card&trk=ft_card)
+
+## Set-up Nginx!
+
+Now we can ssh to our machine, next step is setting up a web server, so we can serve files&do things.
+I chose nginx because when I do bug bounty, I always confronted with this page:
+![Image]({{ site.baseurl }}/images/nginx_hello.png)
+
+I wanted to learn much more about it, so maybe I can find misconfigurations.
+The steps I took, you can do the same:
+* Open up your favorite browser and search engine.
+* Then search for "how to use nginx", "how to use nginx medium", "how to nginx"...
+
+I am skipping details, of course you can download it like:
+
+{% highlight bash %}
+apt install nginx
+{% endhighlight %}
+
+But it vary OS to OS.
+
+Start nginx with:
+{% highlight bash %}
+sudo systemctl enable nginx
+sudo systemctl start nginx
+{% endhighlight %}
+
+* Next step, download php-fpm. So we can run php with nginx.
+
+I didn't know what was php-fpm before, as my understanding when nginx gets a request, it forwards
+that to php-fpm, then php-fpm do the job send results back to nginx, eventually we can see result.
+
+After getting php-fpm you should change your nginx configurations.
+I modified /etc/nginx/nginx.conf, and append a comment
+```
+include /etc/nginx/conf.d/*.conf;
+#include /etc/nginx/sites-enabled/*;
+```
+Then I created a file at /etc/nginx/conf.d/my.conf and changed the default configuration file's extension to .bak
+```
+server {
+  # Example PHP Nginx FPM config file
+  listen 80 default_server;
+  listen [::]:80 default_server;
+  root /var/www/html;
+
+  index index.html index.htm index.nginx-debian.html;
+
+  server_name _;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+
+  # pass PHP scripts on Nginx to FastCGI (PHP-FPM) server
+  location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+
+    # Nginx php-fpm sock config:
+    fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+    # Nginx php-cgi config :
+    # Nginx PHP fastcgi_pass 127.0.0.1:9000;
+  }
+
+  # deny access to Apache .htaccess on Nginx with PHP, 
+  # if Apache and Nginx document roots concur
+  location ~ /\.ht {
+    deny all;
+  }
+} # End of PHP FPM Nginx config example
+```
+I am not sure if it was the right way to do that. I suggest not taking anything here as absolute.
+
+Start php-fpm with:
+{% highlight bash %}
+sudo systemctl enable php-fpm
+sudo systemctl start php-fpm
+{% endhighlight %}
+
+If it doesnt work try to restart both php-fpm&nginx
+
+* Access nginx from browser
+
+If we try to access our webserver like http://[ipaddress]
+It wouldn't work because we didn't allow port 80 on amazon. By default it's blocking any port except 22.
+
+* Go to instances
+Click to your instance id.
+![Image]({{ site.baseurl }}/images/instances.png)
+
+* Scroll down and click security
+![Image]({{ site.baseurl }}/images/security.png)
+
+* Click security groups
+![Image]({{ site.baseurl }}/images/security_groups.png)
+
+* Click Edit inbound rules
+![Image]({{ site.baseurl }}/images/inbound_rules.png)
+
+* Add rule and save it
+![Image]({{ site.baseurl }}/images/http_80.png)
+
+* After a few minutes you can access nginx directly from browser.
+http://[ipaddress]
+
+* Add index.html
+You can add index.html /var/www/html/index.html
+But I'll skip this because I don't need it rn.
+
+* Test php
+
+Let's confirm php-fpm is working.
+Try to create test.php file, /var/www/html/test.php
+
+{% highlight php %}
+<?php
+echo "Hello, World!";
+?>
+{% endhighlight php %}
+
+Acces this file, http://[ip_address]/test.php
+If you see 'Hello, World!', PHP-FPM is working!
+If not, I suggest researching it from other resources as well; maybe I missed a step.
+
+## Last step, buying domain & creating xss cases
+
+You don't have to buy domain and attach to your ip address, but I wanted it to be as realistic as possible so I did. (I used [namecheap.com](https://www.namecheap.com))
+
+### Reflected XSS
+
+#### Post Based Reflected XSS
+Reflected xss case felt easier than others, so I started with it.
+
+Only thing I know about reflected xss is, server reflects our input to output somehow.
+This was my first case:
+* Users opens rxss01.html
+* User fills the form and send a POST request to rxss01.php
+* rxss01.php responds with a html page containing user's input.
+I could probably do same thing with only one php file (rather than creating html and php)
+but it felt easier.
+
+php file:
+{% highlight php %}
+<?php
+if (isset($_POST['name'])) {
+    #$name = htmlspecialchars($_POST['name']);
+    $name = $_POST['name'];
+    $new_html = <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Merhaba $name!</title>
+</head>
+<body>
+    <button type="button" name="memleket" onclick="location.href='/rxss/rxss01.html';">geri</button>
+    <h1>Merhaba $name!</h1>
+</body>
+</html>
+HTML;
+    echo $new_html;
+} else {
+    echo "Hata: Ad gönderilmedi.";
+}
+
+?>
+{% endhighlight php %}
+
+html file:
+
+{% highlight html %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Allah Allah bu da nesi</title>
+</head>
+<body>
+    <button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+    <h1>Lütfen sadece ad giriniz</h1>
+    <form action="rxss01.php" method="post">
+        <label for="name">Adınız:</label>
+        <input type="text" id="name" name="name">
+        <input type="submit" value="Gönder">
+    </form>
+</body>
+</html>
+{% endhighlight html %}
+
+Notice, I comment out
+```
+#$name = htmlspecialchars($_POST['name']);
+```
+If we use htmlspecialchars it would prevent xss.
+
+I don't know how to write php, in fact this was the first time a deploy a site.
+So I used chatgpt and [OWASP Vulnerable Web Application](https://github.com/OWASP/Vulnerable-Web-Application/tree/master/XSS). I was in a loop, edit their codes --> try to understand --> edit their codes...
+
+#### Get Based Reflected XSS
+
+I did same steps:
+* Chatgpt :D
+* Google
+* Repeat
+
+{% highlight php %}
+<!DOCTYPE html>
+<html>
+<head>
+   <title>iks es es</title>
+</head>
+<body>
+    <div style="background-color:#3269a8;padding:15px;">
+      <button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+    </div>
+<div align="center">
+   <form method="GET" action="" name="form">
+   <p>Adınızı giriniz:<input type="text" name="username"></p>
+   <input type="submit" name="yolla" value="yolla">
+   <button type="button" name="temizle" onclick="location.href = '/rxss/rxss02.php';">temizle</button>
+</form>
+   </div>
+<?php
+if (isset($_GET["username"])) {
+   $user = $_GET["username"];
+   echo "Süper gizli şifreniz! = "."$user"."123!";
+}
+?>
+</body>
+</html>
+{% endhighlight php %}
+
+It's takes username's value and reflects it back.
+
+```
+http://[ip]/rxss/rxss02.php?username=<h1>hi</h1>
+```
+
+After viewing source, we can clearly see it's working.
+Our input reflected without any sanitizing.
+
+{% highlight html %}
+<!DOCTYPE html>
+<html>
+<head>
+   <title>iks es es</title>
+</head>
+<body>
+    <div style="background-color:#3269a8;padding:15px;">
+      <button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+    </div>
+<div align="center">
+   <form method="GET" action="" name="form">
+   <p>Adınızı giriniz:<input type="text" name="username"></p>
+   <input type="submit" name="yolla" value="yolla">
+   <button type="button" name="temizle" onclick="location.href = '/rxss/rxss02.php';">temizle</button>
+</form>
+   </div>
+Süper gizli şifreniz! = <h1>hi</h1>123!</body>
+</html>
+{% endhighlight html%}
+
+![Image]({{ site.baseurl }}/images/rxss02.png)
+
+#### Header Based Reflected XSS
+
+* Same steps
+
+{% highlight php%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>XSS via HTTP Headers</title>
+</head>
+<body>
+    <h1>HTTP Headers</h1>
+    <button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+    <table border="1">
+        <tr>
+            <th>Header</th>
+            <th>Value</th>
+        </tr>
+        <?php
+        $headers = getallheaders();
+        foreach ($headers as $header => $value) {
+            echo "<tr><td>{$header}</td><td>{$value}</td></tr>";
+        }
+        ?>
+    </table>
+</body>
+</html>
+{% endhighlight php%}
+
+It gets headers and prints them:
+
+![Image]({{ site.baseurl }}/images/rxss03-1.png)
+
+If we change headers with Burp Suite (You can use another proxies or browser addons too)
+
+![Image]({{ site.baseurl }}/images/rxss03-2.png)
+
+![Image]({{ site.baseurl }}/images/rxss03-3.png)
+
+### Stored XSS
+
+For Stored XSS we need a database management system, I used mariadb for that.
+I got help from chatgpt&google again.
+Steps:
+* Create a database
+* Create a table
+* Create a user and give access
+* Create a php file and check if it is working
+
+{% highlight php%}
+ <?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+$dbname = "database_name";
+
+// Bağlantı oluşturma
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+echo "Connected successfully";
+?> 
+{% endhighlight php%}
+
+I confirmed, it was working.
+
+#### Post Based Stored XSS
+
+{% highlight php%}
+<?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+$dbname = "mydatabase";
+
+// Bağlantı oluşturma
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Bağlantıyı kontrol etme
+if ($conn->connect_error) {
+    die("Bağlantı başarısız: " . $conn->connect_error);
+}
+
+// Kullanıcı adı ekleme fonksiyonu
+function addUser($conn, $username) {
+    $stmt = $conn->prepare("INSERT INTO users (username) VALUES (?)");
+    $stmt->bind_param("s", $username);
+
+    if ($stmt->execute()) {
+        echo "Kullanıcı adı başarıyla eklendi.<br>";
+    } else {
+        echo "Hata: " . $stmt->error . "<br>";
+    }
+
+    $stmt->close();
+}
+
+// Kullanıcı adlarını listeleme fonksiyonu
+function listUsers($conn) {
+    $sql = "SELECT username FROM users";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            echo "Kullanıcı Adı: " . $row["username"]. "<br>";
+        }
+    } else {
+        echo "Hiç kullanıcı adı bulunamadı.<br>";
+    }
+}
+
+// Tüm kullanıcı adlarını silme fonksiyonu
+function deleteAllUsers($conn) {
+    $sql = "DELETE FROM users";
+    if ($conn->query($sql) === TRUE) {
+        echo "Tüm kullanıcı adları silindi.<br>";
+    } else {
+        echo "Hata: " . $conn->error . "<br>";
+    }
+}
+
+// Form gönderildiğinde fonksiyonları çağırma
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['add_user'])) {
+        $username = $_POST['username'];
+        addUser($conn, $username);
+    }
+
+    if (isset($_POST['delete_all_users'])) {
+        deleteAllUsers($conn);
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stored iks es es</title>
+</head>
+<body>
+<button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+<h2>Kullanıcı Adı Ekle</h2>
+<form method="post">
+    Kullanıcı Adı: <input type="text" name="username">
+    <input type="submit" name="add_user" value="Ekle">
+</form>
+
+<h2>Mevcut Kullanıcı Adları</h2>
+<?php
+// Mevcut kullanıcı adlarını listeleme
+listUsers($conn);
+?>
+
+<form method="post">
+    <input type="submit" name="delete_all_users" value="Tümünü Sil">
+</form>
+
+</body>
+</html>
+
+<?php
+// Bağlantıyı kapatma
+$conn->close();
+?>
+{% endhighlight php%}
+
+* It takes input from user
+* connects to "mydatabase"
+* saves user's input to users table
+* shows all usernames from users table
+
+* Input:
+
+![Image]({{ site.baseurl }}/images/sxss01-1.png)
+
+* Output:
+
+![Image]({{ site.baseurl }}/images/sxss01-2.png)
+
+#### Get Based Stored XSS
+
+This was little bit tricky but has same principles as reflected xss, only difference is we are saving input to database.
+
+{% highlight php%}
+<?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+$dbname = "mydatabase";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Bağlantı başarısız: " . $conn->connect_error);
+}
+
+function addNumbers($conn, $username) {
+    $stmt = $conn->prepare("INSERT INTO sayılar (sayı) VALUES (?)");
+    $stmt->bind_param("s", $username);
+
+    if ($stmt->execute()) {
+        echo "Şanslı sayın artık benim :)<br>";
+    } else {
+        echo "Hata: " . $stmt->error . "<br>";
+    }
+
+    $stmt->close();
+}
+
+function listNumbers($conn) {
+    $sql = "SELECT sayı FROM sayılar";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            echo "Şanslı sayı: " . $row["sayı"]. "<br>";
+        }
+    } else {
+        echo "Hiç şanslı sayı bulunamadı.<br>";
+    }
+}
+
+// Tüm kullanıcı adlarını silme fonksiyonu
+function deleteAllNumbers($conn) {
+    $sql = "DELETE FROM sayılar";
+    if ($conn->query($sql) === TRUE) {
+        echo "Tüm şanslı sayılar silindi.<br>";
+    } else {
+        echo "Hata: " . $conn->error . "<br>";
+    }
+}
+
+// GET isteği ile gelen parametreyi al ve veritabanına ekle
+if (isset($_GET['sayı'])) {
+    $username = $_GET['sayı'];
+    addNumbers($conn, $username);
+}
+
+// POST isteği ile tüm kullanıcı adlarını sil
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['delete_all_users'])) {
+        deleteAllNumbers($conn);
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Şanslı Sayı Dağıtım Merkezi</title>
+</head>
+<body>
+<button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+<h2>Şanslı Sayı Ekle</h2>
+<form method="get">
+    Şanslı Sayını gir: <input type="text" name="sayı">
+    <input type="submit" value="Ekle">
+</form>
+
+<h2>Şanslı Sayılar</h2>
+<?php
+// Mevcut kullanıcı adlarını listeleme
+listNumbers($conn);
+?>
+
+<h2>Tüm Şanslı Sayıları Sil</h2>
+<form method="post">
+    <input type="submit" name="delete_all_users" value="Tümünü Sil">
+</form>
+
+</body>
+</html>
+
+<?php
+$conn->close();
+?>
+{% endhighlight php%}
+
+* Input:
+```
+http://[ip or domain]/sxss/sxss02.php?sayı=<input type="range" min="0" max="50">
+if the above code doesn't work, here it is url encoded:
+http://[ip or domain]/sxss/sxss02.php?sayı=<input+type%3D"range"+min%3D"0"+max%3D"50">
+```
+
+![Image]({{ site.baseurl }}/images/sxss02-1.png)
+
+* Output:
+
+![Image]({{ site.baseurl }}/images/sxss02-2.png)
+
+Btw I am using custom html tags to show we can do things but it isn't right way to show there is cross site scripting issue. I am just so lazy to redact my domain name.
+
+What I meant to say is: we already know there is a xss vuln but irl if we want to confirm it by triggering	 some scripts not html tags. Having HTML injection doesn't necessarily imply the presence of XSS.
+
+#### Header Based Stored XSS
+
+Something important:
+Don't hard-code your creds into php like I did.
+It it just test so I don't care about it, but irl it matters.
+
+{% highlight php%}
+<?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+$dbname = "mydatabase";
+
+// Bağlantı oluşturma
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Bağlantıyı kontrol etme
+if ($conn->connect_error) {
+    die("Bağlantı başarısız: " . $conn->connect_error);
+}
+
+// Kullanıcı adı ekleme fonksiyonu
+function addUser($conn, $nickname, $headers) {
+    $stmt = $conn->prepare("INSERT INTO nicknames (nickname, user_agent, accept_language, referer) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $nickname, $headers['User-Agent'], $headers['Accept-Language'], $headers['Referer']);
+
+    if ($stmt->execute()) {
+        echo "İlginiz için teşekkürler!<br>";
+    } else {
+        echo "Hata: " . $stmt->error . "<br>";
+    }
+
+    $stmt->close();
+}
+
+// Kullanıcı adlarını ve header bilgilerini listeleme fonksiyonu
+function listUsers($conn) {
+    $sql = "SELECT nickname, user_agent, accept_language, referer FROM nicknames";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            echo "Kullanıcı Adı: " . $row["nickname"]. "<br>";
+            echo "User-Agent: " . $row["user_agent"]. "<br>";
+            echo "Accept-Language: " . $row["accept_language"]. "<br>";
+            echo "Referer: " . $row["referer"]. "<br><br>";
+        }
+    } else {
+        echo "Olamaz hiçbir şey yok!<br>";
+    }
+}
+
+// Tüm kullanıcı adlarını silme fonksiyonu
+function deleteAllUsers($conn) {
+    $sql = "DELETE FROM nicknames";
+    if ($conn->query($sql) === TRUE) {
+        echo "Tüm kullanıcı adları silindi.<br>";
+    } else {
+        echo "Hata: " . $conn->error . "<br>";
+    }
+}
+
+// Gelen POST isteği ile nickname'i ekle
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['nickname'])) {
+        $nickname = htmlspecialchars($_POST['nickname']);
+        addUser($conn, $nickname, getallheaders());
+    }
+
+    // Tüm kullanıcı adlarını sil
+    if (isset($_POST['delete_all_users'])) {
+        deleteAllUsers($conn);
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Havalı Nickname Toplama Departmanı</title>
+</head>
+<body>
+<button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+<h2>Havalı bir nickname yaz!</h2>
+<!--kullanıcı adını filtreledim sorun olmamalı(!)-->
+<form method="post">
+    Nickname: <input type="text" name="nickname">
+    <input type="submit" value="Ekle">
+</form>
+
+<h2>Mevcut en havalılar:</h2>
+<?php
+// Mevcut kullanıcı adlarını listeleme
+listUsers($conn);
+?>
+
+<h2>Hepsini sil!!!</h2>
+<form method="post">
+    <input type="submit" name="delete_all_users" value="Tümünü Sil">
+</form>
+
+</body>
+</html>
+
+<?php
+// Bağlantıyı kapatma
+$conn->close();
+?>
+{% endhighlight php%}
+
+This time I used htmlspecialchars, so xss only in reflected headers:
+```
+$nickname = htmlspecialchars($_POST['nickname']);
+```
+
+* Input 1:
+
+![Image]({{ site.baseurl }}/images/sxss03-1.png)
+
+* Output 1:
+
+![Image]({{ site.baseurl }}/images/sxss03-2.png)
+
+* Input 2:
+
+![Image]({{ site.baseurl }}/images/sxss03-3.png)
+
+* Output 2:
+
+![Image]({{ site.baseurl }}/images/sxss03-4.png)
+
+### DOM XSS
+
+To be honest, I am not sure about that part.
+
+#### Get Based DOM XSS
+
+For this example I asked to chatgpt "Can you write a html file that takes user input and use it innerHTML for dom xss test case?".
+
+{% highlight html%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DOM XSS</title>
+    <script type="text/javascript">
+        // URL'den belirli bir parametreyi almak için bir fonksiyon
+        function getParameterByName(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Parametreyi alıp innerHTML'e koyma
+        function displayParameter() {
+            const param = getParameterByName('input');
+            if (param) {
+                document.getElementById('output').innerHTML = param;
+            }
+        }
+
+        // Sayfa yüklendiğinde parametreyi göster
+        window.onload = displayParameter;
+    </script>
+</head>
+<body>
+    <button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+    <h1>DOM XSS</h1>
+    <div id="output"></div>
+</body>
+</html>
+{% endhighlight html%}
+
+* Input:
+
+```
+http://[ip or domain]/dxss/dxss01.html?input=<img src=x onerror=alert("hi")>
+```
+
+* Output:
+
+![Image]({{ site.baseurl }}/images/dxss01.png)
+
+#### Post Based DOM XSS
+
+I created 2 files: 
+* dxss02.php
+* dxss02.html
+
+Flow like this:
+* User goes to dxss02.html
+* Sends data via form to dxss02.php
+* dxss02.html receives data from dxss02.php
+* Puts it in innerHTML
+
+dxss02.html:
+
+{% highlight html%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POST-Based DOM XSS</title>
+</head>
+<body>
+    <button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+    <h1>POST-Based DOM XSS</h1>
+    <form id="searchForm">
+        <label for="searchInput">Ara:</label>
+        <input type="text" id="searchInput" name="search">
+        <button type="submit">Yolla</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Formun normal şekilde gönderilmesini engelle
+
+            var searchQuery = document.getElementById('searchInput').value;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'dxss02.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var resultElement = document.getElementById('result');
+
+                    // DOM'a doğrudan kullanıcı girdisi ekleniyor
+                    resultElement.innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send('search=' + encodeURIComponent(searchQuery));
+        });
+    </script>
+</body>
+</html>
+{% endhighlight html%}
+
+dxss02.php:
+
+{% highlight php%}
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $search = $_POST['search'];
+
+    // Kullanıcı girdisini doğrudan döndürüyoruz
+    echo "Çok aradık ama kalmamış: " . $search;
+}
+?>
+{% endhighlight php%}
+
+* Input:
+
+![Image]({{ site.baseurl }}/images/dxss02-1.png)
+
+* Output:
+
+![Image]({{ site.baseurl }}/images/dxss02-2.png)
+
+#### Header Based DOM XSS
+
+* Take headers, put them into innerHTML.
+
+dxss03.html:
+
+{% highlight php%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header-Based DOM XSS</title>
+</head>
+<body>
+    <button type="button" name="memleket" onclick="location.href='/anasayfa.html';">memleket</button>
+    <h1>Header-Based DOM XSS</h1>
+    <div id="content"></div>
+
+    <script>
+        fetch('dxss03.php')
+            .then(response => response.text())
+            .then(data => {
+                // Tehlikeli içeriği doğrudan innerHTML ile eklemek
+                document.getElementById('content').innerHTML = data;
+            });
+    </script>
+</body>
+</html>
+{% endhighlight php%}
+
+dxss03.php:
+{% highlight php%}
+<?php
+header('Content-Type: text/plain');
+
+$headers = getallheaders();
+$userAgent = isset($headers['User-Agent']) ? $headers['User-Agent'] : 'Unknown User-Agent';
+
+echo "Sen kimsin?: $userAgent";
+?>
+{% endhighlight php%}
+
+* Normal:
+
+![Image]({{ site.baseurl }}/images/dxss03-1.png)
+
+* Malicious header:
+
+![Image]({{ site.baseurl }}/images/dxss03-2.png)
+
+![Image]({{ site.baseurl }}/images/dxss03-3.png)
+
+But it didn't trigger?
+
+Here is why:
+
+![Image]({{ site.baseurl }}/images/why_:D.png)
+[here](https://www.tutorialspoint.com/can-scripts-be-inserted-with-innerhtml)
+
+* Different payload:
+
+```
+<img src=x onerror=alert("hi")>
+```
+
+![Image]({{ site.baseurl }}/images/dxss03-4.png)
+
+![Image]({{ site.baseurl }}/images/dxss03-5.png)
+
+### Thank You For Reading So Far

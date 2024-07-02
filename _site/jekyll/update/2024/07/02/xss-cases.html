@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>XSS Test Cases | Welcome to my first blog!</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="XSS Test Cases" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Hi, this is my first blog and first post. This post about xss test cases assignment given by Gallipoli. Gallipoli is newly formed group, the goal is to help people get started in Bug Bounty. There are a many experienced people in web security and many beginners too. I was interested in bbh, so I wanted to give it a shot, learn new things etc. The goal of this assignment is creating 3 test cases for each category: reflected xss, stored xss and dom xss. (e.g., post based reflected xss, get based reflected xss, header based reflected xss.)" />
+<meta property="og:description" content="Hi, this is my first blog and first post. This post about xss test cases assignment given by Gallipoli. Gallipoli is newly formed group, the goal is to help people get started in Bug Bounty. There are a many experienced people in web security and many beginners too. I was interested in bbh, so I wanted to give it a shot, learn new things etc. The goal of this assignment is creating 3 test cases for each category: reflected xss, stored xss and dom xss. (e.g., post based reflected xss, get based reflected xss, header based reflected xss.)" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2024/07/02/xss-cases.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2024/07/02/xss-cases.html" />
+<meta property="og:site_name" content="Welcome to my first blog!" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-07-02T13:07:12+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="XSS Test Cases" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-07-02T13:07:12+03:00","datePublished":"2024-07-02T13:07:12+03:00","description":"Hi, this is my first blog and first post. This post about xss test cases assignment given by Gallipoli. Gallipoli is newly formed group, the goal is to help people get started in Bug Bounty. There are a many experienced people in web security and many beginners too. I was interested in bbh, so I wanted to give it a shot, learn new things etc. The goal of this assignment is creating 3 test cases for each category: reflected xss, stored xss and dom xss. (e.g., post based reflected xss, get based reflected xss, header based reflected xss.)","headline":"XSS Test Cases","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2024/07/02/xss-cases.html"},"url":"http://localhost:4000/jekyll/update/2024/07/02/xss-cases.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Welcome to my first blog!" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Welcome to my first blog!</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">XSS Test Cases</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-07-02T13:07:12+03:00" itemprop="datePublished">Jul 2, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Hi, this is my first blog and first post.
+This post about xss test cases assignment given by Gallipoli.
+Gallipoli is newly formed group, the goal is to help people get started in Bug Bounty.
+There are a many experienced people in web security and many beginners too.
+I was interested in bbh, so I wanted to give it a shot, learn new things etc.
+The goal of this assignment is creating 3 test cases for each category: reflected xss, stored xss and dom xss.
+(e.g., post based reflected xss, get based reflected xss, header based reflected xss.)</p>
+
+<p>Let’s get started!</p>
+
+<h2 id="getting-a-vps">Getting a VPS!</h2>
+
+<p>First step is getting a vps, so we can test everything live.
+I choose amazon aws ec2 free tier, because it is <strong>free</strong> for 12 months.
+<a href="https://aws.amazon.com/ec2/?did=ft_card&amp;trk=ft_card">Here</a></p>
+
+<h2 id="set-up-nginx">Set-up Nginx!</h2>
+
+<p>Now we can ssh to our machine, next step is setting up a web server, so we can serve files&amp;do things.
+I chose nginx because when I do bug bounty, I always confronted with this page:
+<img src="/images/nginx_hello.png" alt="Image" /></p>
+
+<p>I wanted to learn much more about it, so maybe I can find misconfigurations.
+The steps I took, you can do the same:</p>
+<ul>
+  <li>Open up your favorite browser and search engine.</li>
+  <li>Then search for “how to use nginx”, “how to use nginx medium”, “how to nginx”…</li>
+</ul>
+
+<p>I am skipping details, of course you can download it like:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">apt <span class="nb">install </span>nginx</code></pre></figure>
+
+<p>But it vary OS to OS.</p>
+
+<p>Start nginx with:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo </span>systemctl <span class="nb">enable </span>nginx
+<span class="nb">sudo </span>systemctl start nginx</code></pre></figure>
+
+<ul>
+  <li>Next step, download php-fpm. So we can run php with nginx.</li>
+</ul>
+
+<p>I didn’t know what was php-fpm before, as my understanding when nginx gets a request, it forwards
+that to php-fpm, then php-fpm do the job send results back to nginx, eventually we can see result.</p>
+
+<p>After getting php-fpm you should change your nginx configurations.
+I modified /etc/nginx/nginx.conf, and append a comment</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>include /etc/nginx/conf.d/*.conf;
+#include /etc/nginx/sites-enabled/*;
+</code></pre></div></div>
+<p>Then I created a file at /etc/nginx/conf.d/my.conf and changed the default configuration file’s extension to .bak</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>server {
+  # Example PHP Nginx FPM config file
+  listen 80 default_server;
+  listen [::]:80 default_server;
+  root /var/www/html;
+
+  index index.html index.htm index.nginx-debian.html;
+
+  server_name _;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+
+  # pass PHP scripts on Nginx to FastCGI (PHP-FPM) server
+  location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+
+    # Nginx php-fpm sock config:
+    fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+    # Nginx php-cgi config :
+    # Nginx PHP fastcgi_pass 127.0.0.1:9000;
+  }
+
+  # deny access to Apache .htaccess on Nginx with PHP, 
+  # if Apache and Nginx document roots concur
+  location ~ /\.ht {
+    deny all;
+  }
+} # End of PHP FPM Nginx config example
+</code></pre></div></div>
+<p>I am not sure if it was the right way to do that. I suggest not taking anything here as absolute.</p>
+
+<p>Start php-fpm with:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo </span>systemctl <span class="nb">enable </span>php-fpm
+<span class="nb">sudo </span>systemctl start php-fpm</code></pre></figure>
+
+<p>If it doesnt work try to restart both php-fpm&amp;nginx</p>
+
+<ul>
+  <li>Access nginx from browser</li>
+</ul>
+
+<p>If we try to access our webserver like http://[ipaddress]
+It wouldn’t work because we didn’t allow port 80 on amazon. By default it’s blocking any port except 22.</p>
+
+<ul>
+  <li>
+    <p>Go to instances
+Click to your instance id.
+<img src="/images/instances.png" alt="Image" /></p>
+  </li>
+  <li>
+    <p>Scroll down and click security
+<img src="/images/security.png" alt="Image" /></p>
+  </li>
+  <li>
+    <p>Click security groups
+<img src="/images/security_groups.png" alt="Image" /></p>
+  </li>
+  <li>
+    <p>Click Edit inbound rules
+<img src="/images/inbound_rules.png" alt="Image" /></p>
+  </li>
+  <li>
+    <p>Add rule and save it
+<img src="/images/http_80.png" alt="Image" /></p>
+  </li>
+  <li>
+    <p>After a few minutes you can access nginx directly from browser.
+http://[ipaddress]</p>
+  </li>
+  <li>
+    <p>Add index.html
+You can add index.html /var/www/html/index.html
+But I’ll skip this because I don’t need it rn.</p>
+  </li>
+  <li>
+    <p>Test php</p>
+  </li>
+</ul>
+
+<p>Let’s confirm php-fpm is working.
+Try to create test.php file, /var/www/html/test.php</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="k">echo</span> <span class="s2">"Hello, World!"</span><span class="p">;</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+
+<p>Acces this file, http://[ip_address]/test.php
+If you see ‘Hello, World!’, PHP-FPM is working!
+If not, I suggest researching it from other resources as well; maybe I missed a step.</p>
+
+<h2 id="last-step-buying-domain--creating-xss-cases">Last step, buying domain &amp; creating xss cases</h2>
+
+<p>You don’t have to buy domain and attach to your ip address, but I wanted it to be as realistic as possible so I did. (I used <a href="https://www.namecheap.com">namecheap.com</a>)</p>
+
+<h3 id="reflected-xss">Reflected XSS</h3>
+
+<h4 id="post-based-reflected-xss">Post Based Reflected XSS</h4>
+<p>Reflected xss case felt easier than others, so I started with it.</p>
+
+<p>Only thing I know about reflected xss is, server reflects our input to output somehow.
+This was my first case:</p>
+<ul>
+  <li>Users opens rxss01.html</li>
+  <li>User fills the form and send a POST request to rxss01.php</li>
+  <li>rxss01.php responds with a html page containing user’s input.
+I could probably do same thing with only one php file (rather than creating html and php)
+but it felt easier.</li>
+</ul>
+
+<p>php file:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="c1">#$name = htmlspecialchars($_POST['name']);</span>
+    <span class="nv">$name</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'name'</span><span class="p">];</span>
+    <span class="nv">$new_html</span> <span class="o">=</span> <span class="sh">&lt;&lt;&lt;HTML
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Merhaba $name!&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;button type="button" name="memleket" onclick="location.href='/rxss/rxss01.html';"&gt;geri&lt;/button&gt;
+    &lt;h1&gt;Merhaba $name!&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+HTML;</span>
+    <span class="k">echo</span> <span class="nv">$new_html</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">"Hata: Ad gönderilmedi."</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cp">?&gt;</span></code></pre></figure>
+
+<p>html file:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Allah Allah bu da nesi<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>Lütfen sadece ad giriniz<span class="nt">&lt;/h1&gt;</span>
+    <span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"rxss01.php"</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"name"</span><span class="nt">&gt;</span>Adınız:<span class="nt">&lt;/label&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">id=</span><span class="s">"name"</span> <span class="na">name=</span><span class="s">"name"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Gönder"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p>Notice, I comment out</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#$name = htmlspecialchars($_POST['name']);
+</code></pre></div></div>
+<p>If we use htmlspecialchars it would prevent xss.</p>
+
+<p>I don’t know how to write php, in fact this was the first time a deploy a site.
+So I used chatgpt and <a href="https://github.com/OWASP/Vulnerable-Web-Application/tree/master/XSS">OWASP Vulnerable Web Application</a>. I was in a loop, edit their codes –&gt; try to understand –&gt; edit their codes…</p>
+
+<h4 id="get-based-reflected-xss">Get Based Reflected XSS</h4>
+
+<p>I did same steps:</p>
+<ul>
+  <li>Chatgpt :D</li>
+  <li>Google</li>
+  <li>Repeat</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+   <span class="nt">&lt;title&gt;</span>iks es es<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"background-color:#3269a8;padding:15px;"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">align=</span><span class="s">"center"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"GET"</span> <span class="na">action=</span><span class="s">""</span> <span class="na">name=</span><span class="s">"form"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;p&gt;</span>Adınızı giriniz:<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"username"</span><span class="nt">&gt;&lt;/p&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">name=</span><span class="s">"yolla"</span> <span class="na">value=</span><span class="s">"yolla"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"temizle"</span> <span class="na">onclick=</span><span class="s">"location.href = '/rxss/rxss02.php';"</span><span class="nt">&gt;</span>temizle<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+   <span class="nt">&lt;/div&gt;</span>
+<span class="cp">&lt;?php</span>
+<span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">"username"</span><span class="p">]))</span> <span class="p">{</span>
+   <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s2">"username"</span><span class="p">];</span>
+   <span class="k">echo</span> <span class="s2">"Süper gizli şifreniz! = "</span><span class="mf">.</span><span class="s2">"</span><span class="nv">$user</span><span class="s2">"</span><span class="mf">.</span><span class="s2">"123!"</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p>It’s takes username’s value and reflects it back.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://[ip]/rxss/rxss02.php?username=&lt;h1&gt;hi&lt;/h1&gt;
+</code></pre></div></div>
+
+<p>After viewing source, we can clearly see it’s working.
+Our input reflected without any sanitizing.</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+   <span class="nt">&lt;title&gt;</span>iks es es<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"background-color:#3269a8;padding:15px;"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">align=</span><span class="s">"center"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"GET"</span> <span class="na">action=</span><span class="s">""</span> <span class="na">name=</span><span class="s">"form"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;p&gt;</span>Adınızı giriniz:<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"username"</span><span class="nt">&gt;&lt;/p&gt;</span>
+   <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">name=</span><span class="s">"yolla"</span> <span class="na">value=</span><span class="s">"yolla"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"temizle"</span> <span class="na">onclick=</span><span class="s">"location.href = '/rxss/rxss02.php';"</span><span class="nt">&gt;</span>temizle<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+   <span class="nt">&lt;/div&gt;</span>
+Süper gizli şifreniz! = <span class="nt">&lt;h1&gt;</span>hi<span class="nt">&lt;/h1&gt;</span>123!<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p><img src="/images/rxss02.png" alt="Image" /></p>
+
+<h4 id="header-based-reflected-xss">Header Based Reflected XSS</h4>
+
+<ul>
+  <li>Same steps</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>XSS via HTTP Headers<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>HTTP Headers<span class="nt">&lt;/h1&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;table</span> <span class="na">border=</span><span class="s">"1"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;tr&gt;</span>
+            <span class="nt">&lt;th&gt;</span>Header<span class="nt">&lt;/th&gt;</span>
+            <span class="nt">&lt;th&gt;</span>Value<span class="nt">&lt;/th&gt;</span>
+        <span class="nt">&lt;/tr&gt;</span>
+        <span class="cp">&lt;?php</span>
+        <span class="nv">$headers</span> <span class="o">=</span> <span class="nb">getallheaders</span><span class="p">();</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$headers</span> <span class="k">as</span> <span class="nv">$header</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s2">"&lt;tr&gt;&lt;td&gt;</span><span class="si">{</span><span class="nv">$header</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td&gt;</span><span class="si">{</span><span class="nv">$value</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;"</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="cp">?&gt;</span>
+    <span class="nt">&lt;/table&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p>It gets headers and prints them:</p>
+
+<p><img src="/images/rxss03-1.png" alt="Image" /></p>
+
+<p>If we change headers with Burp Suite (You can use another proxies or browser addons too)</p>
+
+<p><img src="/images/rxss03-2.png" alt="Image" /></p>
+
+<p><img src="/images/rxss03-3.png" alt="Image" /></p>
+
+<h3 id="stored-xss">Stored XSS</h3>
+
+<p>For Stored XSS we need a database management system, I used mariadb for that.
+I got help from chatgpt&amp;google again.
+Steps:</p>
+<ul>
+  <li>Create a database</li>
+  <li>Create a table</li>
+  <li>Create a user and give access</li>
+  <li>Create a php file and check if it is working</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"> <span class="cp">&lt;?php</span>
+<span class="nv">$servername</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">;</span>
+<span class="nv">$username</span> <span class="o">=</span> <span class="s2">"username"</span><span class="p">;</span>
+<span class="nv">$password</span> <span class="o">=</span> <span class="s2">"password"</span><span class="p">;</span>
+<span class="nv">$dbname</span> <span class="o">=</span> <span class="s2">"database_name"</span><span class="p">;</span>
+
+<span class="c1">// Bağlantı oluşturma</span>
+<span class="nv">$conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">mysqli</span><span class="p">(</span><span class="nv">$servername</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">,</span> <span class="nv">$dbname</span><span class="p">);</span>
+
+<span class="c1">// Check connection</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">die</span><span class="p">(</span><span class="s2">"Connection failed: "</span> <span class="mf">.</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s2">"Connected successfully"</span><span class="p">;</span>
+<span class="cp">?&gt;</span> </code></pre></figure>
+
+<p>I confirmed, it was working.</p>
+
+<h4 id="post-based-stored-xss">Post Based Stored XSS</h4>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="nv">$servername</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">;</span>
+<span class="nv">$username</span> <span class="o">=</span> <span class="s2">"username"</span><span class="p">;</span>
+<span class="nv">$password</span> <span class="o">=</span> <span class="s2">"password"</span><span class="p">;</span>
+<span class="nv">$dbname</span> <span class="o">=</span> <span class="s2">"mydatabase"</span><span class="p">;</span>
+
+<span class="c1">// Bağlantı oluşturma</span>
+<span class="nv">$conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">mysqli</span><span class="p">(</span><span class="nv">$servername</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">,</span> <span class="nv">$dbname</span><span class="p">);</span>
+
+<span class="c1">// Bağlantıyı kontrol etme</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s2">"Bağlantı başarısız: "</span> <span class="mf">.</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Kullanıcı adı ekleme fonksiyonu</span>
+<span class="k">function</span> <span class="n">addUser</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$username</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$stmt</span> <span class="o">=</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="s2">"INSERT INTO users (username) VALUES (?)"</span><span class="p">);</span>
+    <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">bind_param</span><span class="p">(</span><span class="s2">"s"</span><span class="p">,</span> <span class="nv">$username</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Kullanıcı adı başarıyla eklendi.&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Hata: "</span> <span class="mf">.</span> <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="n">error</span> <span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">close</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// Kullanıcı adlarını listeleme fonksiyonu</span>
+<span class="k">function</span> <span class="n">listUsers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"SELECT username FROM users"</span><span class="p">;</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span><span class="o">-&gt;</span><span class="n">num_rows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">while</span><span class="p">(</span><span class="nv">$row</span> <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="nf">fetch_assoc</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s2">"Kullanıcı Adı: "</span> <span class="mf">.</span> <span class="nv">$row</span><span class="p">[</span><span class="s2">"username"</span><span class="p">]</span><span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Hiç kullanıcı adı bulunamadı.&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Tüm kullanıcı adlarını silme fonksiyonu</span>
+<span class="k">function</span> <span class="n">deleteAllUsers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"DELETE FROM users"</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">)</span> <span class="o">===</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Tüm kullanıcı adları silindi.&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Hata: "</span> <span class="mf">.</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">error</span> <span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Form gönderildiğinde fonksiyonları çağırma</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'POST'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'add_user'</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nv">$username</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'username'</span><span class="p">];</span>
+        <span class="nf">addUser</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$username</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'delete_all_users'</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nf">deleteAllUsers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span>
+
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Stored iks es es<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;h2&gt;</span>Kullanıcı Adı Ekle<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+    Kullanıcı Adı: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"username"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">name=</span><span class="s">"add_user"</span> <span class="na">value=</span><span class="s">"Ekle"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+
+<span class="nt">&lt;h2&gt;</span>Mevcut Kullanıcı Adları<span class="nt">&lt;/h2&gt;</span>
+<span class="cp">&lt;?php</span>
+<span class="c1">// Mevcut kullanıcı adlarını listeleme</span>
+<span class="nf">listUsers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+
+<span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">name=</span><span class="s">"delete_all_users"</span> <span class="na">value=</span><span class="s">"Tümünü Sil"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+
+<span class="cp">&lt;?php</span>
+<span class="c1">// Bağlantıyı kapatma</span>
+<span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">close</span><span class="p">();</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+
+<ul>
+  <li>It takes input from user</li>
+  <li>connects to “mydatabase”</li>
+  <li>saves user’s input to users table</li>
+  <li>
+    <p>shows all usernames from users table</p>
+  </li>
+  <li>Input:</li>
+</ul>
+
+<p><img src="/images/sxss01-1.png" alt="Image" /></p>
+
+<ul>
+  <li>Output:</li>
+</ul>
+
+<p><img src="/images/sxss01-2.png" alt="Image" /></p>
+
+<h4 id="get-based-stored-xss">Get Based Stored XSS</h4>
+
+<p>This was little bit tricky but has same principles as reflected xss, only difference is we are saving input to database.</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="nv">$servername</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">;</span>
+<span class="nv">$username</span> <span class="o">=</span> <span class="s2">"username"</span><span class="p">;</span>
+<span class="nv">$password</span> <span class="o">=</span> <span class="s2">"password"</span><span class="p">;</span>
+<span class="nv">$dbname</span> <span class="o">=</span> <span class="s2">"mydatabase"</span><span class="p">;</span>
+
+<span class="nv">$conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">mysqli</span><span class="p">(</span><span class="nv">$servername</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">,</span> <span class="nv">$dbname</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s2">"Bağlantı başarısız: "</span> <span class="mf">.</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">addNumbers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$username</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$stmt</span> <span class="o">=</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="s2">"INSERT INTO sayılar (sayı) VALUES (?)"</span><span class="p">);</span>
+    <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">bind_param</span><span class="p">(</span><span class="s2">"s"</span><span class="p">,</span> <span class="nv">$username</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Şanslı sayın artık benim :)&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Hata: "</span> <span class="mf">.</span> <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="n">error</span> <span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">close</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">listNumbers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"SELECT sayı FROM sayılar"</span><span class="p">;</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span><span class="o">-&gt;</span><span class="n">num_rows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">while</span><span class="p">(</span><span class="nv">$row</span> <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="nf">fetch_assoc</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s2">"Şanslı sayı: "</span> <span class="mf">.</span> <span class="nv">$row</span><span class="p">[</span><span class="s2">"sayı"</span><span class="p">]</span><span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Hiç şanslı sayı bulunamadı.&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Tüm kullanıcı adlarını silme fonksiyonu</span>
+<span class="k">function</span> <span class="n">deleteAllNumbers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"DELETE FROM sayılar"</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">)</span> <span class="o">===</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Tüm şanslı sayılar silindi.&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Hata: "</span> <span class="mf">.</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">error</span> <span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// GET isteği ile gelen parametreyi al ve veritabanına ekle</span>
+<span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'sayı'</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$username</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'sayı'</span><span class="p">];</span>
+    <span class="nf">addNumbers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$username</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// POST isteği ile tüm kullanıcı adlarını sil</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'POST'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'delete_all_users'</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nf">deleteAllNumbers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span>
+
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Şanslı Sayı Dağıtım Merkezi<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;h2&gt;</span>Şanslı Sayı Ekle<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"get"</span><span class="nt">&gt;</span>
+    Şanslı Sayını gir: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"sayı"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Ekle"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+
+<span class="nt">&lt;h2&gt;</span>Şanslı Sayılar<span class="nt">&lt;/h2&gt;</span>
+<span class="cp">&lt;?php</span>
+<span class="c1">// Mevcut kullanıcı adlarını listeleme</span>
+<span class="nf">listNumbers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+
+<span class="nt">&lt;h2&gt;</span>Tüm Şanslı Sayıları Sil<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">name=</span><span class="s">"delete_all_users"</span> <span class="na">value=</span><span class="s">"Tümünü Sil"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+
+<span class="cp">&lt;?php</span>
+<span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">close</span><span class="p">();</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+
+<ul>
+  <li>Input:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://[ip or domain]/sxss/sxss02.php?sayı=&lt;input type="range" min="0" max="50"&gt;
+if the above code doesn't work, here it is url encoded:
+http://[ip or domain]/sxss/sxss02.php?sayı=&lt;input+type%3D"range"+min%3D"0"+max%3D"50"&gt;
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p><img src="/images/sxss02-1.png" alt="Image" /></p>
+
+<ul>
+  <li>Output:</li>
+</ul>
+
+<p><img src="/images/sxss02-2.png" alt="Image" /></p>
+
+<p>Btw I am using custom html tags to show we can do things but it isn’t right way to show there is cross site scripting issue. I am just so lazy to redact my domain name.</p>
+
+<p>What I meant to say is: we already know there is a xss vuln but irl if we want to confirm it by triggering	 some scripts not html tags. Having HTML injection doesn’t necessarily imply the presence of XSS.</p>
+
+<h4 id="header-based-stored-xss">Header Based Stored XSS</h4>
+
+<p>Something important:
+Don’t hard-code your creds into php like I did.
+It it just test so I don’t care about it, but irl it matters.</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="nv">$servername</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">;</span>
+<span class="nv">$username</span> <span class="o">=</span> <span class="s2">"username"</span><span class="p">;</span>
+<span class="nv">$password</span> <span class="o">=</span> <span class="s2">"password"</span><span class="p">;</span>
+<span class="nv">$dbname</span> <span class="o">=</span> <span class="s2">"mydatabase"</span><span class="p">;</span>
+
+<span class="c1">// Bağlantı oluşturma</span>
+<span class="nv">$conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">mysqli</span><span class="p">(</span><span class="nv">$servername</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">,</span> <span class="nv">$dbname</span><span class="p">);</span>
+
+<span class="c1">// Bağlantıyı kontrol etme</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s2">"Bağlantı başarısız: "</span> <span class="mf">.</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Kullanıcı adı ekleme fonksiyonu</span>
+<span class="k">function</span> <span class="n">addUser</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$nickname</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$stmt</span> <span class="o">=</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">prepare</span><span class="p">(</span><span class="s2">"INSERT INTO nicknames (nickname, user_agent, accept_language, referer) VALUES (?, ?, ?, ?)"</span><span class="p">);</span>
+    <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">bind_param</span><span class="p">(</span><span class="s2">"ssss"</span><span class="p">,</span> <span class="nv">$nickname</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">[</span><span class="s1">'User-Agent'</span><span class="p">],</span> <span class="nv">$headers</span><span class="p">[</span><span class="s1">'Accept-Language'</span><span class="p">],</span> <span class="nv">$headers</span><span class="p">[</span><span class="s1">'Referer'</span><span class="p">]);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">execute</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"İlginiz için teşekkürler!&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Hata: "</span> <span class="mf">.</span> <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="n">error</span> <span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$stmt</span><span class="o">-&gt;</span><span class="nf">close</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// Kullanıcı adlarını ve header bilgilerini listeleme fonksiyonu</span>
+<span class="k">function</span> <span class="n">listUsers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"SELECT nickname, user_agent, accept_language, referer FROM nicknames"</span><span class="p">;</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span><span class="o">-&gt;</span><span class="n">num_rows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">while</span><span class="p">(</span><span class="nv">$row</span> <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="nf">fetch_assoc</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s2">"Kullanıcı Adı: "</span> <span class="mf">.</span> <span class="nv">$row</span><span class="p">[</span><span class="s2">"nickname"</span><span class="p">]</span><span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+            <span class="k">echo</span> <span class="s2">"User-Agent: "</span> <span class="mf">.</span> <span class="nv">$row</span><span class="p">[</span><span class="s2">"user_agent"</span><span class="p">]</span><span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+            <span class="k">echo</span> <span class="s2">"Accept-Language: "</span> <span class="mf">.</span> <span class="nv">$row</span><span class="p">[</span><span class="s2">"accept_language"</span><span class="p">]</span><span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+            <span class="k">echo</span> <span class="s2">"Referer: "</span> <span class="mf">.</span> <span class="nv">$row</span><span class="p">[</span><span class="s2">"referer"</span><span class="p">]</span><span class="mf">.</span> <span class="s2">"&lt;br&gt;&lt;br&gt;"</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Olamaz hiçbir şey yok!&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Tüm kullanıcı adlarını silme fonksiyonu</span>
+<span class="k">function</span> <span class="n">deleteAllUsers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"DELETE FROM nicknames"</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">)</span> <span class="o">===</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Tüm kullanıcı adları silindi.&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"Hata: "</span> <span class="mf">.</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">error</span> <span class="mf">.</span> <span class="s2">"&lt;br&gt;"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Gelen POST isteği ile nickname'i ekle</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'POST'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'nickname'</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nv">$nickname</span> <span class="o">=</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'nickname'</span><span class="p">]);</span>
+        <span class="nf">addUser</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$nickname</span><span class="p">,</span> <span class="nb">getallheaders</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Tüm kullanıcı adlarını sil</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'delete_all_users'</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nf">deleteAllUsers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span>
+
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Havalı Nickname Toplama Departmanı<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;h2&gt;</span>Havalı bir nickname yaz!<span class="nt">&lt;/h2&gt;</span>
+<span class="c">&lt;!--kullanıcı adını filtreledim sorun olmamalı(!)--&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+    Nickname: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"nickname"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Ekle"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+
+<span class="nt">&lt;h2&gt;</span>Mevcut en havalılar:<span class="nt">&lt;/h2&gt;</span>
+<span class="cp">&lt;?php</span>
+<span class="c1">// Mevcut kullanıcı adlarını listeleme</span>
+<span class="nf">listUsers</span><span class="p">(</span><span class="nv">$conn</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+
+<span class="nt">&lt;h2&gt;</span>Hepsini sil!!!<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">name=</span><span class="s">"delete_all_users"</span> <span class="na">value=</span><span class="s">"Tümünü Sil"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+
+<span class="cp">&lt;?php</span>
+<span class="c1">// Bağlantıyı kapatma</span>
+<span class="nv">$conn</span><span class="o">-&gt;</span><span class="nf">close</span><span class="p">();</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+
+<p>This time I used htmlspecialchars, so xss only in reflected headers:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$nickname = htmlspecialchars($_POST['nickname']);
+</code></pre></div></div>
+
+<ul>
+  <li>Input 1:</li>
+</ul>
+
+<p><img src="/images/sxss03-1.png" alt="Image" /></p>
+
+<ul>
+  <li>Output 1:</li>
+</ul>
+
+<p><img src="/images/sxss03-2.png" alt="Image" /></p>
+
+<ul>
+  <li>Input 2:</li>
+</ul>
+
+<p><img src="/images/sxss03-3.png" alt="Image" /></p>
+
+<ul>
+  <li>Output 2:</li>
+</ul>
+
+<p><img src="/images/sxss03-4.png" alt="Image" /></p>
+
+<h3 id="dom-xss">DOM XSS</h3>
+
+<p>To be honest, I am not sure about that part.</p>
+
+<h4 id="get-based-dom-xss">Get Based DOM XSS</h4>
+
+<p>For this example I asked to chatgpt “Can you write a html file that takes user input and use it innerHTML for dom xss test case?”.</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>DOM XSS<span class="nt">&lt;/title&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+        <span class="c1">// URL'den belirli bir parametreyi almak için bir fonksiyon</span>
+        <span class="kd">function</span> <span class="nf">getParameterByName</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">const</span> <span class="nx">urlParams</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">URLSearchParams</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nx">urlParams</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Parametreyi alıp innerHTML'e koyma</span>
+        <span class="kd">function</span> <span class="nf">displayParameter</span><span class="p">()</span> <span class="p">{</span>
+            <span class="kd">const</span> <span class="nx">param</span> <span class="o">=</span> <span class="nf">getParameterByName</span><span class="p">(</span><span class="dl">'</span><span class="s1">input</span><span class="dl">'</span><span class="p">);</span>
+            <span class="k">if </span><span class="p">(</span><span class="nx">param</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">output</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">param</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Sayfa yüklendiğinde parametreyi göster</span>
+        <span class="nb">window</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="nx">displayParameter</span><span class="p">;</span>
+    <span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>DOM XSS<span class="nt">&lt;/h1&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"output"</span><span class="nt">&gt;&lt;/div&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<ul>
+  <li>Input:</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://[ip or domain]/dxss/dxss01.html?input=&lt;img src=x onerror=alert("hi")&gt;
+</code></pre></div></div>
+
+<ul>
+  <li>Output:</li>
+</ul>
+
+<p><img src="/images/dxss01.png" alt="Image" /></p>
+
+<h4 id="post-based-dom-xss">Post Based DOM XSS</h4>
+
+<p>I created 2 files:</p>
+<ul>
+  <li>dxss02.php</li>
+  <li>dxss02.html</li>
+</ul>
+
+<p>Flow like this:</p>
+<ul>
+  <li>User goes to dxss02.html</li>
+  <li>Sends data via form to dxss02.php</li>
+  <li>dxss02.html receives data from dxss02.php</li>
+  <li>Puts it in innerHTML</li>
+</ul>
+
+<p>dxss02.html:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"viewport"</span> <span class="na">content=</span><span class="s">"width=device-width, initial-scale=1.0"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>POST-Based DOM XSS<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>POST-Based DOM XSS<span class="nt">&lt;/h1&gt;</span>
+    <span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">"searchForm"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">"searchInput"</span><span class="nt">&gt;</span>Ara:<span class="nt">&lt;/label&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">id=</span><span class="s">"searchInput"</span> <span class="na">name=</span><span class="s">"search"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"submit"</span><span class="nt">&gt;</span>Yolla<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+    <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">"result"</span><span class="nt">&gt;&lt;/p&gt;</span>
+
+    <span class="nt">&lt;script&gt;</span>
+        <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">searchForm</span><span class="dl">'</span><span class="p">).</span><span class="nf">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">submit</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">event</span><span class="p">.</span><span class="nf">preventDefault</span><span class="p">();</span> <span class="c1">// Formun normal şekilde gönderilmesini engelle</span>
+
+            <span class="kd">var</span> <span class="nx">searchQuery</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">searchInput</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">;</span>
+            <span class="kd">var</span> <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">XMLHttpRequest</span><span class="p">();</span>
+            <span class="nx">xhr</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">dxss02.php</span><span class="dl">'</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+            <span class="nx">xhr</span><span class="p">.</span><span class="nf">setRequestHeader</span><span class="p">(</span><span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">application/x-www-form-urlencoded</span><span class="dl">'</span><span class="p">);</span>
+            <span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">if </span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">===</span> <span class="mi">4</span> <span class="o">&amp;&amp;</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">resultElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">result</span><span class="dl">'</span><span class="p">);</span>
+
+                    <span class="c1">// DOM'a doğrudan kullanıcı girdisi ekleniyor</span>
+                    <span class="nx">resultElement</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">};</span>
+            <span class="nx">xhr</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="dl">'</span><span class="s1">search=</span><span class="dl">'</span> <span class="o">+</span> <span class="nf">encodeURIComponent</span><span class="p">(</span><span class="nx">searchQuery</span><span class="p">));</span>
+        <span class="p">});</span>
+    <span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p>dxss02.php:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">"REQUEST_METHOD"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"POST"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$search</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'search'</span><span class="p">];</span>
+
+    <span class="c1">// Kullanıcı girdisini doğrudan döndürüyoruz</span>
+    <span class="k">echo</span> <span class="s2">"Çok aradık ama kalmamış: "</span> <span class="mf">.</span> <span class="nv">$search</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+
+<ul>
+  <li>Input:</li>
+</ul>
+
+<p><img src="/images/dxss02-1.png" alt="Image" /></p>
+
+<ul>
+  <li>Output:</li>
+</ul>
+
+<p><img src="/images/dxss02-2.png" alt="Image" /></p>
+
+<h4 id="header-based-dom-xss">Header Based DOM XSS</h4>
+
+<ul>
+  <li>Take headers, put them into innerHTML.</li>
+</ul>
+
+<p>dxss03.html:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"viewport"</span> <span class="na">content=</span><span class="s">"width=device-width, initial-scale=1.0"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Header-Based DOM XSS<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">name=</span><span class="s">"memleket"</span> <span class="na">onclick=</span><span class="s">"location.href='/anasayfa.html';"</span><span class="nt">&gt;</span>memleket<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>Header-Based DOM XSS<span class="nt">&lt;/h1&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"content"</span><span class="nt">&gt;&lt;/div&gt;</span>
+
+    <span class="nt">&lt;script&gt;</span>
+        <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">dxss03.php</span><span class="dl">'</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nf">text</span><span class="p">())</span>
+            <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span> <span class="p">{</span>
+                <span class="c1">// Tehlikeli içeriği doğrudan innerHTML ile eklemek</span>
+                <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">content</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">data</span><span class="p">;</span>
+            <span class="p">});</span>
+    <span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p>dxss03.php:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="nb">header</span><span class="p">(</span><span class="s1">'Content-Type: text/plain'</span><span class="p">);</span>
+
+<span class="nv">$headers</span> <span class="o">=</span> <span class="nb">getallheaders</span><span class="p">();</span>
+<span class="nv">$userAgent</span> <span class="o">=</span> <span class="k">isset</span><span class="p">(</span><span class="nv">$headers</span><span class="p">[</span><span class="s1">'User-Agent'</span><span class="p">])</span> <span class="o">?</span> <span class="nv">$headers</span><span class="p">[</span><span class="s1">'User-Agent'</span><span class="p">]</span> <span class="o">:</span> <span class="s1">'Unknown User-Agent'</span><span class="p">;</span>
+
+<span class="k">echo</span> <span class="s2">"Sen kimsin?: </span><span class="nv">$userAgent</span><span class="s2">"</span><span class="p">;</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+
+<ul>
+  <li>Normal:</li>
+</ul>
+
+<p><img src="/images/dxss03-1.png" alt="Image" /></p>
+
+<ul>
+  <li>Malicious header:</li>
+</ul>
+
+<p><img src="/images/dxss03-2.png" alt="Image" /></p>
+
+<p><img src="/images/dxss03-3.png" alt="Image" /></p>
+
+<p>But it didn’t trigger?</p>
+
+<p>Here is why:</p>
+
+<p><img src="/images/why_:D.png" alt="Image" />
+<a href="https://www.tutorialspoint.com/can-scripts-be-inserted-with-innerhtml">here</a></p>
+
+<ul>
+  <li>Different payload:</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;img src=x onerror=alert("hi")&gt;
+</code></pre></div></div>
+
+<p><img src="/images/dxss03-4.png" alt="Image" /></p>
+
+<p><img src="/images/dxss03-5.png" alt="Image" /></p>
+
+<h3 id="thank-you-for-reading-so-far">Thank You For Reading So Far</h3>
+
+  </div><a class="u-url" href="/jekyll/update/2024/07/02/xss-cases.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Welcome to my first blog!</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Welcome to my first blog!</li><li><a class="u-email" href="mailto:yusufmeteyilmazcontact@proton.me">yusufmeteyilmazcontact@proton.me</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/sololevel1ng"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">sololevel1ng</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Hiii!</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
